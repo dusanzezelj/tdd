@@ -29,6 +29,7 @@ class PurchaseTicketsTest extends TestCase
 
         //arrange
         $concert = factory(Concert::class)->create(['ticket_price' => 3250]);
+        $concert->addTickets(3);
 
         //act
         $this->orderTickets($concert, [
@@ -71,7 +72,7 @@ class PurchaseTicketsTest extends TestCase
     /** @test */
     function an_order_is_not_created_if_payment_fails(){
         $concert = factory(Concert::class)->create(['ticket_price' => 3250]);
-
+        $concert->addTickets(3);
         //act
         $this->orderTickets($concert, [
             'email' => 'john@example.com',
@@ -88,6 +89,8 @@ class PurchaseTicketsTest extends TestCase
     function cannot_purchase_tickets_to_an_unpublished_concert()
     {
         $concert = factory(Concert::class)->create(['published_at' => null]);
+        $concert->addTickets(3);
+
         $paymentGateway = new FakePaymentGateway();
         $this->app->instance(\App\Billing\PaymentGateway::class, $paymentGateway);
 
