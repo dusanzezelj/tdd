@@ -22,4 +22,24 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
         return $app;
     }
+
+    /**
+     * using if we want to see error message, not only status code.
+     * We need to call this method where we want to see error message
+     */
+    protected function disableExceptionHandling()
+    {
+        app()->instance(Handler::class, new class extends Handler {
+           public function __construct()
+           {
+           }
+
+           public function report(Exception $e){
+
+           }
+           public function render($request, Exception $e){
+               throw $e;
+           }
+        });
+    }
 }
