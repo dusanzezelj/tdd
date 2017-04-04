@@ -28,7 +28,7 @@ class PurchaseTicketsTest extends TestCase
         $this->app->instance(\App\Billing\PaymentGateway::class, $paymentGateway);
 
         //arrange
-        $concert = factory(Concert::class)->create(['ticket_price' => 3250]);
+        $concert = factory(Concert::class)->create(['ticket_price' => 3250, 'published_at' => date("Y-m-d H:i:s")]);
         $concert->addTickets(3);
 
         //act
@@ -40,6 +40,12 @@ class PurchaseTicketsTest extends TestCase
 
         //assert
         $this->assertResponseStatus(201);
+
+        $this->seeJsonSubset([
+            'email' => 'john@example.com',
+            'ticket_quantity' => 3,
+            'amount' => 9750
+        ]);
         //make sure the customer was charged the correct amount
         $this->assertEquals(9750, $paymentGateway->totalCharges());
 
@@ -48,9 +54,9 @@ class PurchaseTicketsTest extends TestCase
             return $order->email = 'john@example.com';
         }));*/
 
-        $order = $concert->orders->where('email', 'john@example.com')->first();
-        $this->assertNotNull($order);
-        $this->assertEquals(3, $order->tickets()->count());
+        $this->assertTrue($concert->hasOrderFor('john@example.com'));
+
+        $this->assertEquals(3, $concert->ordersFor('john@example.com')->first()->ticketQuantity());
     }
 
     /** @test */
@@ -101,7 +107,8 @@ class PurchaseTicketsTest extends TestCase
         ]);
 
         $this->assertResponseStatus(404);
-        $this->assertEquals(0, $concert->orders()->count());
+        $this->assertFalse($concert->hasOrderFor('john@example.com'));
+        // nema potrebe za ovom metodom ak ose poziva ova iznad nje. $this->assertEquals(0, $concert->orders()->count());
         $this->assertEquals(0, $paymentGateway->totalCharges());
     }
 

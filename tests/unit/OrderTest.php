@@ -25,4 +25,19 @@ class OrderTest extends TestCase
         $this->assertEquals(10, $concert->ticketsRemaining());
         $this->assertNull(Order::find($order->id));
     }
+
+    /** @test */
+    function converting_to_an_array()
+    {
+        $concert = factory(Concert::class)->create();
+        $concert->addTickets(5);
+        $order = $concert->orderTickets('jane@example.com', 5);
+
+        $result = $order->toArray();
+
+        $this->assertEquals([
+            'email' => 'jane@example.com',
+            'ticket_quantity' => 5
+        ], $result);
+    }
 }
