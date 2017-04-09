@@ -72,7 +72,7 @@ class ConcertTest extends TestCase
     function can_add_tickets(){
         $concert = factory(Concert::class)->create();
 
-        $concert->addTicket(50);
+        $concert->addTickets(50);
 
         $this->assertEquals(50, $concert->ticketsRemaining());
     }

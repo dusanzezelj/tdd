@@ -26,11 +26,17 @@ class ConcertOrdersController extends Controller
             'email' => 'required'
         ]);
         try {
-            $order = $concert->orderTickets(request('email'), request('ticket_quantity'));
+            $tickets = $concert->findTickets(request('ticket_quantity'));
+
             $ticketQuantity = request('ticket_quantity');
             $amount = $ticketQuantity * $concert->ticket_price;
             $token = request('payment_token');
             $this->paymentGateway->charge($amount, $token);
+
+            $order = $concert->createOrder(request('email'), $tickets);
+
+            //$order = $concert->orderTickets(request('email'), request('ticket_quantity'));
+
 
             //$order = $concert->orders()->create(['email' => request('email')]);
 
