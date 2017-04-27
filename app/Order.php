@@ -39,4 +39,16 @@ class Order extends Model
             'amount' => $this->amount
         ];
     }
+
+    public static function forTickets($tickets, $email, $amount = null){
+        $order = self::create([
+            'email' => $email,
+            'amount' => $amount === null ? $tickets->sum('price') : $amount
+        ]);
+
+        foreach ($tickets as $ticket){
+            $order->tickets()->save($ticket);
+        }
+        return $order;
+    }
 }
