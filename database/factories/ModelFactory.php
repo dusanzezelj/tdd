@@ -43,5 +43,14 @@ $factory->state(App\Concert::class, 'published', function($faker){
     return [
         'published_at' => Carbon::parse('-1 week')
         ];
+});*/
+
+$factory->define(App\Ticket::class, function (Faker\Generator $faker) {
+    return [
+        //kreira se pomocu callback funkcije zato sto u slucaju da se koncert prosled i kao argument ne dolazi do poziva ove funkcije (ne kreira se novi koncert)
+        'concert_id' => function () {
+            return factory(App\Concert::class)->create()->id;
+        }
+    ];
 });
-*/
+
